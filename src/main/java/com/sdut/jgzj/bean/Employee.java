@@ -10,6 +10,8 @@ public class Employee {
     private String email;
 
     private Integer dId;
+    
+    private Department department;
 
     public Integer getEmpId() {
         return empId;
