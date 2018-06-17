@@ -15,7 +15,15 @@ public class Employee {
     
     
 
-    public Employee(Integer empId, String empName, String gender, String email, Integer dId) {
+    public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	public Employee(Integer empId, String empName, String gender, String email, Integer dId) {
 		super();
 		this.empId = empId;
 		this.empName = empName;
