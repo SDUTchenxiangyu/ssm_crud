@@ -10,6 +10,8 @@
  		<package name="com.sdut.jgzj.bean"/>
  	</typeAliases>
  	<plugins>
- 		<plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+ 		<plugin interceptor="com.github.pagehelper.PageInterceptor">
+ 			<property name="reasonable" value="true" />
+ 		</plugin>
  	</plugins>
  </configuration>
