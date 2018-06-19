@@ -20,6 +20,20 @@ import com.sdut.jgzj.service.EmployeeService;
 public class EmployeeController {
 	@Autowired
 	EmployeeService employeeService;
+	@ResponseBody
+	@RequestMapping("/checkuser")
+	public Msg checkuser(@RequestParam("empName")String empName) {
+		String regx = "(^[a-zA-Z0-9_-]{6,16}$)|(^[\\u2E80-\\u9FFF]{2,5})";
+		if(!empName.matches(regx)) {
+			return Msg.fail().add("va_msg", "用户名只能是2-5位中文或6-16位英文！");
+		}
+		boolean b = employeeService.checkUser(empName);
+		if(b) {
+			return Msg.success();
+		}else {
+			return Msg.fail().add("va_msg", "用户名不可用");
+		}
+	}
 	@RequestMapping(value="/emp",method=RequestMethod.POST)
 	@ResponseBody
 	public Msg saveEmp(Employee employee) {

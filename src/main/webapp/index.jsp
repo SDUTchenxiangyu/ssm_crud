@@ -33,12 +33,14 @@
     						<label for="empName_add_input" class="col-sm-2 control-label">empName</label>
     						<div class="col-sm-10">
       							<input type="text" name="empName" class="form-control" id="empName_add_input" placeholder="empName">
+      							<span class="help-block"></span> 
     						</div>
   						</div>
   						<div class="form-group">
     						<label for="email_add_input" class="col-sm-2 control-label">email</label>
     						<div class="col-sm-10">
       							<input type="text" name="email" class="form-control" id="email_add_input" placeholder="Email@163.com">
+      							<span class="help-block"></span> 
     						</div>
   						</div>
   						<div class="form-group">
@@ -189,7 +191,14 @@
 			var navEle = $("<nav></nav>").append(ul);
 			navEle.appendTo("#page_nav_area");
 		}
+		function reset_form(ele){
+			$(ele)[0].reset();
+			$(ele).find("*").removeClass("has-error has-success");
+			$(ele).find(".help-block").text("");
+		}
 		$("#emp_add_modal_btn").click(function(){
+			reset_form("#empAddModal form");
+			$("#empAddModal form")[0].reset();
 			getDepts();
 			$('#empAddModal').modal({
 					backdrop:"static"
@@ -207,7 +216,60 @@
 				}
 			});
 		}
+		function validate_add_from(){
+			var empName = $("#empName_add_input").val();
+			var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/;
+			if(!regName.test(empName)){
+				show_validate_msg("#empName_add_input","error","用户名只能是2-5位中文或6-16位英文！");
+				return false;
+			}else{
+				show_validate_msg("#empName_add_input","success","");
+			}
+			var email = $("#email_add_input").val();
+			var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+			if(!regEmail.test(email)){
+				show_validate_msg("#email_add_input","error","邮箱格式不正确！");
+				return false;
+			}else{
+				show_validate_msg("#email_add_input","success","");
+			}
+			return true;
+		}
+		function show_validate_msg(ele,status,msg){
+			$(ele).parent().removeClass("has-success has-error");
+			$(ele).next("span").text("");
+			if("success" == status){
+				$(ele).parent().addClass("has-success");
+				$(ele).next("span").text(msg);
+			}else if("error" == status){
+				$(ele).parent().addClass("has-error");
+				$(ele).next("span").text(msg);
+			}
+		}
+		$("#empName_add_input").change(function(){
+			var empName = this.value;
+			$.ajax({
+				url:"${APP_PATH}/checkuser",
+				data:"empName=" + empName,
+				type:"POST",
+				success:function(result){
+					if(result.code == 100){
+						show_validate_msg("#empName_add_input","success","用户名可用");
+						$("#emp_save_btn").attr("ajax-va","success");
+					}else{
+						show_validate_msg("#empName_add_input","error",result.extend.va_msg);
+						$("#emp_save_btn").attr("ajax-va","error");
+					}
+				}
+			})
+		});
 		$("#emp_save_btn").click(function(){
+			if(!validate_add_from()){
+				return false;
+			}
+			if($(this).attr("ajax-va")=="error"){
+				return false;
+			}
 			$.ajax({
 				url:"${APP_PATH}/emp",
 				type:"POST",
@@ -215,7 +277,6 @@
 				success:function(result){
 					$("#empAddModal").modal('hide');
 					to_page(totalRecord);
-					alert(result.msg);
 				}
 			});
 		});
